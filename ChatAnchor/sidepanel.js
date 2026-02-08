@@ -13,11 +13,10 @@ document.addEventListener('DOMContentLoaded', () => {
             const item = document.createElement('div');
             item.className = 'bookmark-item';
             
-            // Domain clean anzeigen
-            let domain = "Unbekannt";
+            let domain = "Link";
             try {
                 if (bm.url) domain = new URL(bm.url).hostname.replace('www.', '');
-            } catch (e) { console.error(e); }
+            } catch (e) {}
 
             item.innerHTML = `
                 <span class="text-preview">"${bm.text}..."</span>
@@ -38,30 +37,31 @@ document.addEventListener('DOMContentLoaded', () => {
         const targetUrlClean = bookmark.url.split('#')[0];
 
         chrome.tabs.query({}, (tabs) => {
-            // FIX: Sicherheitscheck 'tab.url &&', damit es nicht bei System-Tabs crasht
             const existingTab = tabs.find(tab => tab.url && tab.url.startsWith(targetUrlClean));
 
             if (existingTab) {
-                // A: Tab existiert -> hinwechseln
+                // A: Tab schon offen
                 chrome.tabs.update(existingTab.id, { active: true });
                 chrome.windows.update(existingTab.windowId, { focused: true });
 
                 setTimeout(() => {
                     chrome.tabs.sendMessage(existingTab.id, { 
                         action: "jumpToText", 
-                        text: bookmark.fullText 
+                        text: bookmark.fullText,
+                        scrollRatio: bookmark.scrollRatio // <--- WICHTIG: Das hat gefehlt!
                     });
                 }, 500);
 
             } else {
-                // B: Nicht offen -> neu öffnen
+                // B: Neu öffnen
                 chrome.tabs.create({ url: bookmark.url }, (newTab) => {
                     const listener = (tabId, changeInfo) => {
                         if (tabId === newTab.id && changeInfo.status === 'complete') {
                             setTimeout(() => {
                                 chrome.tabs.sendMessage(newTab.id, { 
                                     action: "jumpToText", 
-                                    text: bookmark.fullText 
+                                    text: bookmark.fullText,
+                                    scrollRatio: bookmark.scrollRatio 
                                 });
                             }, 2500);
                             chrome.tabs.onUpdated.removeListener(listener);
@@ -73,7 +73,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // 3. Löschen
     clearBtn.onclick = () => {
         if(confirm("Wirklich alle Anker löschen?")) {
             chrome.storage.local.set({ bookmarks: [] }, () => location.reload());
