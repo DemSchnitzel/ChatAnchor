@@ -1,9 +1,9 @@
 {
   "manifest_version": 3,
   "name": "ChatAnchor",
-  "version": "1.1",
+  "version": "1.2",
   "description": "Markiere Text in Chats und springe jederzeit dorthin zurück.",
-  "permissions": ["storage", "contextMenus", "activeTab", "scripting", "sidePanel"],
+  "permissions": ["storage", "contextMenus", "activeTab", "scripting", "sidePanel", "tabs"],
   "background": {
     "service_worker": "background.js"
   },
