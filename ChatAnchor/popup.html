@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <style>
+    body { width: 300px; font-family: sans-serif; padding: 10px; margin: 0; }
+    h3 { color: #1a73e8; font-size: 16px; margin-top: 0; }
+    .bookmark-item { 
+      border-bottom: 1px solid #eee; padding: 10px 5px; 
+      cursor: pointer; transition: background 0.2s;
+    }
+    .bookmark-item:hover { background: #f1f3f4; border-radius: 4px; }
+    .text-preview { font-weight: 500; font-size: 13px; display: block; color: #3c4043; }
+    .date { font-size: 10px; color: #70757a; }
+    button.clear { 
+      margin-top: 15px; width: 100%; padding: 8px;
+      background-color: #f8f9fa; border: 1px solid #dadce0;
+      border-radius: 4px; cursor: pointer; font-size: 11px;
+    }
+    button.clear:hover { background-color: #f1f3f4; }
+  </style>
+</head>
+<body>
+  <h3>⚓ Meine Chat-Anker</h3>
+  <div id="list"></div>
+  <button class="clear" id="clearBtn">Alle Anker löschen</button>
+
+  <script src="popup.js"></script>
+</body>
+</html>
