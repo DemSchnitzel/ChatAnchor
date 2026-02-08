@@ -1,18 +1,21 @@
 {
   "manifest_version": 3,
   "name": "ChatAnchor",
-  "version": "1.0",
+  "version": "1.1",
   "description": "Markiere Text in Chats und springe jederzeit dorthin zurück.",
-  "permissions": ["storage", "contextMenus", "activeTab", "scripting"],
+  "permissions": ["storage", "contextMenus", "activeTab", "scripting", "sidePanel"],
   "background": {
     "service_worker": "background.js"
   },
   "action": {
-    "default_popup": "popup.html"
+    "default_title": "ChatAnchor öffnen"
+  },
+  "side_panel": {
+    "default_path": "sidepanel.html"
   },
   "content_scripts": [
     {
-      "matches": ["https://gemini.google.com/*", "https://chatgpt.com/*", "https://claude.ai/*"],
+      "matches": ["<all_urls>"],
       "js": ["content.js"]
     }
   ]

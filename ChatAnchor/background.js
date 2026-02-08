@@ -1,14 +1,17 @@
-// Erstellt das Rechtsklick-Menü
+// Aktiviert das Side Panel beim Klick auf das Icon
+chrome.sidePanel.setPanelBehavior({ openPanelOnActionClick: true })
+    .catch((error) => console.error(error));
+
+// Kontextmenü erstellen
 chrome.runtime.onInstalled.addListener(() => {
   chrome.contextMenus.create({
     id: "saveChatAnchor",
     title: "⚓ Chat-Anker hier setzen",
     contexts: ["selection"]
   });
-  console.log("Kontextmenü registriert.");
 });
 
-// Lauscht auf den Klick
+// Speichern und Bestätigen
 chrome.contextMenus.onClicked.addListener((info, tab) => {
   if (info.menuItemId === "saveChatAnchor" && info.selectionText) {
     chrome.storage.local.get(["bookmarks"], (result) => {
@@ -22,7 +25,7 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
       };
       
       chrome.storage.local.set({ bookmarks: [newBookmark, ...currentBookmarks] }, () => {
-        // --- NEU: Bestätigung an die Seite senden ---
+        // Bestätigung an den Tab senden
         chrome.tabs.sendMessage(tab.id, { action: "showConfirmation", text: "Anker erfolgreich gesetzt! ⚓" });
       });
     });

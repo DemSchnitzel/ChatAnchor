@@ -1,11 +1,8 @@
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     if (request.action === "jumpToText") {
-        // Wir starten die Suche
         attemptScrollAndFind(request.text, 0);
         sendResponse({ status: "searching" });
-    }
-    // --- NEU: Auf Bestätigung reagieren ---
-    else if (request.action === "showConfirmation") {
+    } else if (request.action === "showConfirmation") {
         showStatusMessage(request.text);
         sendResponse({ status: "confirmed" });
     }
@@ -13,13 +10,11 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 });
 
 function attemptScrollAndFind(text, attempts) {
-    // 1. Bereinige den Suchtext von seltsamen Leerzeichen
     const cleanText = text.trim();
-    
-    // 2. Suche den Text (window.find ist schnell, aber sensibel)
+    // 1. Exakte Suche
     let found = window.find(cleanText, false, false, true);
 
-    // 3. Falls nicht gefunden, versuchen wir es mit einer Teilsuche (ersten 20 Zeichen)
+    // 2. Fallback: Suche nach den ersten 25 Zeichen
     if (!found && cleanText.length > 20) {
         found = window.find(cleanText.substring(0, 25), false, false, true);
     }
@@ -32,7 +27,7 @@ function attemptScrollAndFind(text, attempts) {
             
             element.scrollIntoView({ behavior: 'smooth', block: 'center' });
             
-            // Visuelles Highlight
+            // Highlight
             element.style.transition = "outline 0.5s, background-color 0.5s";
             element.style.outline = "3px solid #1a73e8";
             element.style.backgroundColor = "rgba(26, 115, 232, 0.1)";
@@ -42,24 +37,19 @@ function attemptScrollAndFind(text, attempts) {
             }, 3000);
         }
     } else if (attempts < 30) { 
-        // 4. Weitermachen: Scrolle höher
-        // Wir nutzen hier scrollBy auf dem Haupt-Container, falls vorhanden, sonst window
+        // 3. Scrollen und weitersuchen
         const chatContainer = document.querySelector('infinite-scroller') || window;
         chatContainer.scrollBy(0, -800);
         
-        // Erhöhe die Zeit leicht, damit Gemini Zeit zum "Atmen" hat
         setTimeout(() => {
             attemptScrollAndFind(text, attempts + 1);
         }, 400); 
     } else {
-        // Statt alert() nutzen wir jetzt die Konsole, um den Nutzer nicht zu nerven
-        console.log("ChatAnchor: Text nicht gefunden nach 30 Versuchen.");
-        // Optional: Ein kleiner Hinweis am oberen Rand der Seite statt Popup
-        showStatusMessage("Text im Verlauf nicht gefunden. Scrolle manuell etwas höher.");
+        console.log("ChatAnchor: Text nicht gefunden.");
+        showStatusMessage("Text nicht gefunden. Scrolle manuell etwas höher.");
     }
 }
 
-// Hilfsfunktion für unaufdringliche Nachrichten
 function showStatusMessage(msg) {
     let statusDiv = document.getElementById('chat-anchor-status');
     if (!statusDiv) {
